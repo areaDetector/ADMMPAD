@@ -396,7 +396,7 @@ int mmpadDetector::stringEndsWith(const char *aString, const char *aSubstring, i
  */
 asynStatus mmpadDetector::readImageFile(const char *fileName, epicsTimeStamp *pStartTime, double timeout, NDArray *pImage)
 {
-  const char *functionName = "readImageFile";
+  //static const char *functionName = "readImageFile";
   char tifFileName[MAX_FILENAME_LEN];
 //  if (stringEndsWith(fileName, ".tif", 1) || stringEndsWith(fileName, ".tiff", 1))
 //    {
@@ -433,142 +433,135 @@ asynStatus mmpadDetector::readImageFile(const char *fileName, epicsTimeStamp *pS
  */
 asynStatus mmpadDetector::readCbf(const char *fileName, epicsTimeStamp *pStartTime, double timeout, NDArray *pImage)
 {
-  epicsTimeStamp tStart, tCheck;
-  double deltaTime;
-  int status=-1;
-  const char *functionName = "readCbf";
-  cbf_handle cbf;
-  FILE *file=NULL;
-  unsigned int cbfCompression;
-  int cbfBinaryId;
-  size_t cbfElSize;
-  int cbfElSigned;
-  int cbfElUnsigned;
-  size_t cbfElements;
-  int cbfMinElement;
-  int cbfMaxElement;
-  const char *cbfByteOrder;
-  size_t cbfDimFast;
-  size_t cbfDimMid;
-  size_t cbfDimSlow;
-  size_t cbfPadding;
-  size_t cbfElementsRead;
+    epicsTimeStamp tStart, tCheck;
+    double deltaTime;
+    int status=-1;
+    const char *functionName = "readCbf";
+    cbf_handle cbf;
+    FILE *file=NULL;
+    unsigned int cbfCompression;
+    int cbfBinaryId;
+    size_t cbfElSize;
+    int cbfElSigned;
+    int cbfElUnsigned;
+    size_t cbfElements;
+    int cbfMinElement;
+    int cbfMaxElement;
+    const char *cbfByteOrder;
+    size_t cbfDimFast;
+    size_t cbfDimMid;
+    size_t cbfDimSlow;
+    size_t cbfPadding;
+    size_t cbfElementsRead;
 
-  deltaTime = 0.;
-  epicsTimeGetCurrent(&tStart);
+    deltaTime = 0.;
+    epicsTimeGetCurrent(&tStart);
 
-  status = waitForFileToExist(fileName, pStartTime, timeout, pImage);
-  if (status != asynSuccess)
-    {
-      return((asynStatus)status);
+    status = waitForFileToExist(fileName, pStartTime, timeout, pImage);
+    if (status != asynSuccess) {
+        return((asynStatus)status);
     }
 
-  cbf_set_warning_messages_enabled(0);
-  cbf_set_error_messages_enabled(0);
+    cbf_set_warning_messages_enabled(0);
+    cbf_set_error_messages_enabled(0);
 
-  while (deltaTime <= timeout)
-    {
-      /* At this point we know the file exists, but it may not be completely
-       * written yet.  If we get errors then try again. */
+    while (deltaTime <= timeout) {
+        /* At this point we know the file exists, but it may not be completely
+         * written yet.  If we get errors then try again. */
 
-      status = cbf_make_handle(&cbf);
-      if (status != 0)
-        {
-          asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-                    "%s::%s, failed to make CBF handle, error code %#x\n",
-                    driverName, functionName, status);
-          return(asynError);
+        status = cbf_make_handle(&cbf);
+        if (status != 0) {
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                "%s::%s, failed to make CBF handle, error code %#x\n",
+                driverName, functionName, status);
+            return(asynError);
         }
 
-      status = cbf_set_cbf_logfile(cbf, NULL);
-      if (status != 0)
-        {
-          asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-                    "%s::%s, failed to disable CBF logging, error code %#x\n",
-                    driverName, functionName, status);
-          return(asynError);
+        status = cbf_set_cbf_logfile(cbf, NULL);
+        if (status != 0) {
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                "%s::%s, failed to disable CBF logging, error code %#x\n",
+                driverName, functionName, status);
+            return(asynError);
         }
 
-      file = fopen(fileName, "rb");
-      if (file == NULL)
-        {
-          asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-                    "%s::%s, failed to open CBF file \"%s\" for reading: %s\n",
-                    driverName, functionName, fileName, strerror(errno));
-          cbf_free_handle(cbf);
-          return(asynError);
+        file = fopen(fileName, "rb");
+        if (file == NULL) {
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                "%s::%s, failed to open CBF file \"%s\" for reading: %s\n",
+                driverName, functionName, fileName, strerror(errno));
+            cbf_free_handle(cbf);
+            return(asynError);
         }
 
-      status = cbf_read_widefile(cbf, file, MSG_DIGESTNOW);
-      if (status != 0) goto retry;
+        status = cbf_read_widefile(cbf, file, MSG_DIGESTNOW);
+        if (status != 0) goto retry;
 
-      status = cbf_find_tag(cbf, "_array_data.data");
-      if (status != 0) goto retry;
+        status = cbf_find_tag(cbf, "_array_data.data");
+        if (status != 0) goto retry;
 
-      /* Do some basic checking that the image size is what we expect */
+        /* Do some basic checking that the image size is what we expect */
 
-      status = cbf_get_integerarrayparameters_wdims_fs(cbf, &cbfCompression,
-               &cbfBinaryId, &cbfElSize, &cbfElSigned, &cbfElUnsigned,
-               &cbfElements, &cbfMinElement, &cbfMaxElement, &cbfByteOrder,
-               &cbfDimFast, &cbfDimMid, &cbfDimSlow, &cbfPadding);
-      if (status != 0) goto retry;
+        status = cbf_get_integerarrayparameters_wdims_fs(cbf, &cbfCompression,
+            &cbfBinaryId, &cbfElSize, &cbfElSigned, &cbfElUnsigned,
+            &cbfElements, &cbfMinElement, &cbfMaxElement, &cbfByteOrder,
+            &cbfDimFast, &cbfDimMid, &cbfDimSlow, &cbfPadding);
+        if (status != 0) goto retry;
 
-      if (cbfDimFast != (size_t)pImage->dims[0].size)
-        {
-          asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-                    "%s::%s, image width incorrect =%zd, should be %d\n",
-                    driverName, functionName, cbfDimFast, pImage->dims[0].size);
-          cbf_free_handle(cbf);
-          return(asynError);
+        if (cbfDimFast != pImage->dims[0].size) {
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                "%s::%s, image width incorrect =%lu, should be %lu\n",
+                driverName, functionName, (unsigned long)cbfDimFast, (unsigned long)pImage->dims[0].size);
+            cbf_free_handle(cbf);
+            return(asynError);
         }
-      if (cbfDimMid != (size_t)pImage->dims[1].size)
-        {
-          asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-                    "%s::%s, image height incorrect =%zd, should be %d\n",
-                    driverName, functionName, cbfDimMid, pImage->dims[1].size);
-          cbf_free_handle(cbf);
-          return(asynError);
+        if (cbfDimMid != pImage->dims[1].size) {
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                "%s::%s, image height incorrect =%lu, should be %lu\n",
+                driverName, functionName, (unsigned long)cbfDimMid, (unsigned long)pImage->dims[1].size);
+            cbf_free_handle(cbf);
+            return(asynError);
         }
 
-      /* Read the image */
+        /* Read the image */
 
-      status = cbf_get_integerarray(cbf, &cbfBinaryId, pImage->pData,
-                                    sizeof(epicsInt32), 1, cbfElements, &cbfElementsRead);
-      if (status != 0) goto retry;
-      if (cbfElements != cbfElementsRead) goto retry;
+        status = cbf_get_integerarray(cbf, &cbfBinaryId, pImage->pData,
+            sizeof(epicsInt32), 1, cbfElements, &cbfElementsRead);
+        if (status != 0) goto retry;
+        if (cbfElements != cbfElementsRead) goto retry;
 
-      /* Sucesss! */
-      status = cbf_free_handle(cbf);
-      if (status != 0)
-        {
-          asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-                    "%s::%s, failed to free CBF handle, error code %#x\n",
-                    driverName, functionName, status);
-          return(asynError);
+        /* Sucesss! */
+        status = cbf_free_handle(cbf);
+        if (status != 0) {
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                "%s::%s, failed to free CBF handle, error code %#x\n",
+                driverName, functionName, status);
+            return(asynError);
         }
-      break;
+        break;
 
-retry:
-      status = cbf_free_handle(cbf);
-      if (status != 0)
-        {
-          asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-                    "%s::%s, failed to free CBF handle, error code %#x\n",
-                    driverName, functionName, status);
-          return(asynError);
+        retry:
+        status = cbf_free_handle(cbf);
+        if (status != 0) {
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                "%s::%s, failed to free CBF handle, error code %#x\n",
+                driverName, functionName, status);
+            return(asynError);
         }
-      /* Sleep, but check for stop event, which can be used to abort a long
-       * acquisition */
-      status = epicsEventWaitWithTimeout(this->stopEventId, FILE_READ_DELAY);
-      if (status == epicsEventWaitOK)
-        {
-          return(asynError);
+        /* Sleep, but check for stop event, which can be used to abort a long
+         * acquisition */
+        unlock();
+        status = epicsEventWaitWithTimeout(this->stopEventId, FILE_READ_DELAY);
+        lock();
+        if (status == epicsEventWaitOK) {
+            setIntegerParam(ADStatus, ADStatusAborted);
+            return(asynError);
         }
-      epicsTimeGetCurrent(&tCheck);
-      deltaTime = epicsTimeDiffInSeconds(&tCheck, &tStart);
+        epicsTimeGetCurrent(&tCheck);
+        deltaTime = epicsTimeDiffInSeconds(&tCheck, &tStart);
     }
 
-  return(asynSuccess);
+    return(asynSuccess);
 }
 
 /** This function reads TIFF files using libTiff.  It is not intended to be general,
@@ -578,115 +571,123 @@ retry:
  */
 asynStatus mmpadDetector::readTiff(const char *fileName, epicsTimeStamp *pStartTime, double timeout, NDArray *pImage)
 {
-  epicsTimeStamp tStart, tCheck;
-  double deltaTime;
-  int status=-1;
-  const char *functionName = "readTiff";
-  int size, totalSize;
-  int numStrips, strip;
-  char *buffer;
-  TIFF *tiff=NULL;
-  epicsUInt32 uval;
+    epicsTimeStamp tStart, tCheck;
+    double deltaTime;
+    int status=-1;
+    const char *functionName = "readTiff";
+    size_t totalSize;
+    int size;
+    int numStrips, strip;
+    char *buffer;
+    char *imageDescription;
+    char tempBuffer[2048];
+    TIFF *tiff=NULL;
+    epicsUInt32 uval;
 
-  deltaTime = 0.;
-  epicsTimeGetCurrent(&tStart);
+    deltaTime = 0.;
+    epicsTimeGetCurrent(&tStart);
 
-  /* Suppress error messages from the TIFF library */
-  TIFFSetErrorHandler(NULL);
-  TIFFSetWarningHandler(NULL);
+    /* Suppress error messages from the TIFF library */
+    TIFFSetErrorHandler(NULL);
+    TIFFSetWarningHandler(NULL);
 
-  status = waitForFileToExist(fileName, pStartTime, timeout, pImage);
-  if (status != asynSuccess)
-    {
-      return((asynStatus)status);
+    status = waitForFileToExist(fileName, pStartTime, timeout, pImage);
+    if (status != asynSuccess) {
+        return((asynStatus)status);
     }
 
-  while (deltaTime <= timeout)
-    {
-      /* At this point we know the file exists, but it may not be completely written yet.
-       * If we get errors then try again */
-      tiff = TIFFOpen(fileName, "rc");
-      if (tiff == NULL)
-        {
-          status = asynError;
-          goto retry;
+    while (deltaTime <= timeout) {
+        /* At this point we know the file exists, but it may not be completely written yet.
+         * If we get errors then try again */
+        tiff = TIFFOpen(fileName, "rc");
+        if (tiff == NULL) {
+            status = asynError;
+            goto retry;
         }
-
-      /* Do some basic checking that the image size is what we expect */
-      status = TIFFGetField(tiff, TIFFTAG_IMAGEWIDTH, &uval);
-      if (uval != (epicsUInt32)pImage->dims[0].size)
-        {
-          asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-                    "%s::%s, image width incorrect =%u, should be %d\n",
-                    driverName, functionName, uval, pImage->dims[0].size);
-          goto retry;
+        
+        /* Do some basic checking that the image size is what we expect */
+        status = TIFFGetField(tiff, TIFFTAG_IMAGEWIDTH, &uval);
+        if (uval != (epicsUInt32)pImage->dims[0].size) {
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                "%s::%s, image width incorrect =%u, should be %u\n",
+                driverName, functionName, uval, (epicsUInt32)pImage->dims[0].size);
+            goto retry;
         }
-      status = TIFFGetField(tiff, TIFFTAG_IMAGELENGTH, &uval);
-      if (uval != (epicsUInt32)pImage->dims[1].size)
-        {
-          asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-                    "%s::%s, image length incorrect =%u, should be %d\n",
-                    driverName, functionName, uval, pImage->dims[1].size);
-          goto retry;
+        status = TIFFGetField(tiff, TIFFTAG_IMAGELENGTH, &uval);
+        if (uval != (epicsUInt32)pImage->dims[1].size) {
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                "%s::%s, image length incorrect =%u, should be %u\n",
+                driverName, functionName, uval, (epicsUInt32)pImage->dims[1].size);
+            goto retry;
         }
-      numStrips= TIFFNumberOfStrips(tiff);
-      buffer = (char *)pImage->pData;
-      totalSize = 0;
-      for (strip=0; (strip < numStrips) && (totalSize < pImage->dataSize); strip++)
-        {
-          size = TIFFReadEncodedStrip(tiff, 0, buffer, pImage->dataSize-totalSize);
-          if (size == -1)
-            {
-              /* There was an error reading the file.  Most commonly this is because the file
-               * was not yet completely written.  Try again. */
-              asynPrint(this->pasynUserSelf, ASYN_TRACE_FLOW,
-                        "%s::%s, error reading TIFF file %s\n",
-                        driverName, functionName, fileName);
-              goto retry;
+        numStrips= TIFFNumberOfStrips(tiff);
+        buffer = (char *)pImage->pData;
+        totalSize = 0;
+        for (strip=0; (strip < numStrips) && (totalSize < pImage->dataSize); strip++) {
+            size = TIFFReadEncodedStrip(tiff, 0, buffer, pImage->dataSize-totalSize);
+            if (size == -1) {
+                /* There was an error reading the file.  Most commonly this is because the file
+                 * was not yet completely written.  Try again. */
+                asynPrint(this->pasynUserSelf, ASYN_TRACE_FLOW,
+                    "%s::%s, error reading TIFF file %s\n",
+                    driverName, functionName, fileName);
+                goto retry;
             }
-          buffer += size;
-          totalSize += size;
+            buffer += size;
+            totalSize += size;
         }
-      if (totalSize != pImage->dataSize)
-        {
-          status = asynError;
-          asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
-                    "%s::%s, file size incorrect =%d, should be %d\n",
-                    driverName, functionName, totalSize, pImage->dataSize);
-          goto retry;
+        if (totalSize != pImage->dataSize) {
+            status = asynError;
+            asynPrint(this->pasynUserSelf, ASYN_TRACE_ERROR,
+                "%s::%s, file size incorrect =%lu, should be %lu\n",
+                driverName, functionName, (unsigned long)totalSize, (unsigned long)pImage->dataSize);
+            goto retry;
         }
-      /* Sucesss! */
-      break;
-
-retry:
-      if (tiff != NULL) TIFFClose(tiff);
-      tiff = NULL;
-      /* Sleep, but check for stop event, which can be used to abort a long acquisition */
-      status = epicsEventWaitWithTimeout(this->stopEventId, FILE_READ_DELAY);
-      if (status == epicsEventWaitOK)
-        {
-          return(asynError);
+        /* Sucesss! Read the IMAGEDESCRIPTION tag if it exists */
+        status = TIFFGetField(tiff, TIFFTAG_IMAGEDESCRIPTION, &imageDescription);
+        // Make sure the string is null terminated
+        
+        if (status == 1) {
+            strncpy(tempBuffer, imageDescription, sizeof(tempBuffer));
+            // Make sure the string is null terminated
+            tempBuffer[sizeof(tempBuffer)-1] = 0;
+            pImage->pAttributeList->add("TIFFImageDescription", "TIFFImageDescription", NDAttrString, tempBuffer);
         }
-      epicsTimeGetCurrent(&tCheck);
-      deltaTime = epicsTimeDiffInSeconds(&tCheck, &tStart);
+        
+        break;
+        
+        retry:
+        if (tiff != NULL) TIFFClose(tiff);
+        tiff = NULL;
+        /* Sleep, but check for stop event, which can be used to abort a long acquisition */
+        unlock();
+        status = epicsEventWaitWithTimeout(this->stopEventId, FILE_READ_DELAY);
+        lock();
+        if (status == epicsEventWaitOK) {
+            setIntegerParam(ADStatus, ADStatusAborted);
+            return(asynError);
+        }
+        epicsTimeGetCurrent(&tCheck);
+        deltaTime = epicsTimeDiffInSeconds(&tCheck, &tStart);
     }
 
-  if (tiff != NULL) TIFFClose(tiff);
-  return(asynSuccess);
-}
+    if (tiff != NULL) TIFFClose(tiff);
+
+    return(asynSuccess);
+}   
 
 asynStatus mmpadDetector::setAcquireParams()
 {
   int ival;
   double dval;
   double dval2;
-  int triggerMode;
+//  int triggerMode;
   asynStatus status;
 
   //status = getIntegerParam(ADTriggerMode, &triggerMode);
   //if (status != asynSuccess) triggerMode = 2;
 
-  triggerMode =2;
+//  triggerMode =2;
   /* When we change modes download all exposure parameters, since some modes
   * replace values with new parameters */
 //    if (triggerMode == TMAlignment) {
@@ -698,7 +699,7 @@ asynStatus mmpadDetector::setAcquireParams()
   //    setIntegerParam(ADNumExposures, 1);
   //  }
 
-status = getIntegerParam(ADNumImages, &ival);
+  status = getIntegerParam(ADNumImages, &ival);
   if ((status != asynSuccess) || (ival < 1))
     {
       ival = 1;
@@ -800,7 +801,7 @@ asynStatus mmpadDetector::readCamserver(double timeout)
   if (status != asynSuccess)
     asynPrint(pasynUser, ASYN_TRACE_ERROR,
               "%s:%s, timeout=%f, status=%d received %d bytes\n%s\n",
-              driverName, functionName, timeout, status, nread, this->fromCamserver);
+              driverName, functionName, timeout, status, (int)nread, this->fromCamserver);
   else
     {
       /* Look for the string OK in the response */
@@ -845,13 +846,13 @@ void mmpadDetector::mmpadTask()
 {
   int status = asynSuccess;
   int stat2;
-  int imageCounter;
+//  int imageCounter;
   int numImages;
   int multipleFileNextImage=0;  /* This is the next image number, starting at 0 */
   int acquire;
   ADStatus_t acquiring;
-  double startAngle;
-  NDArray *pImage;
+//  double startAngle;
+//  NDArray *pImage;
   double acquireTime, acquirePeriod;
   double readImageFileTimeout, timeout;
   int triggerMode;
@@ -861,11 +862,11 @@ void mmpadDetector::mmpadTask()
   char filePath[MAX_FILENAME_LEN];
   char fileName[MAX_FILENAME_LEN];
   char fileIncName[MAX_FILENAME_LEN];
-  char statusMessage[MAX_MESSAGE_SIZE];
-  int dims[2];
+//  char statusMessage[MAX_MESSAGE_SIZE];
+//  int dims[2];
   int arrayCallbacks;
-  int flatFieldValid;
-  int len;
+//  int flatFieldValid;
+//  int len;
   int roisum,roiul,roiur,roill,roilr;
   string a;
   stringstream sstr;
@@ -1242,7 +1243,7 @@ void mmpadDetector::mmpadTask()
 
       
       
-      epicsSnprintf(this->toCamserver, sizeof(this->toCamserver),"GetComputation", fullFileName);
+      epicsSnprintf(this->toCamserver, sizeof(this->toCamserver),"GetComputation");
       status = writeReadCamserver(CAMSERVER_DEFAULT_TIMEOUT);
       //status=readCamserver(0.0);
 
@@ -1333,7 +1334,7 @@ asynStatus mmpadDetector::writeInt32(asynUser *pasynUser, epicsInt32 value)
   int function = pasynUser->reason;
   int adstatus;
   asynStatus status = asynSuccess;
-  int	statusdum;
+//  int	statusdum;
   const char *functionName = "writeInt32";
   double videomodeTime;
   
@@ -1824,7 +1825,7 @@ mmpadDetector::mmpadDetector(const char *portName, const char *camserverPort,
 {
   int status = asynSuccess;
   const char *functionName = "mmpadDetector";
-  int dims[2];
+  size_t dims[2];
   int	milbitshift, milon,miloffset;
 
 
