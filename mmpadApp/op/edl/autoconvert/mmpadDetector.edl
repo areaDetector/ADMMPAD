@@ -1,0 +1,843 @@
+4 0 1
+beginScreenProperties
+major 4
+minor 0
+release 1
+x 342
+y 61
+w 893
+h 480
+font "helvetica-medium-r-18.0"
+ctlFont "helvetica-bold-r-10.0"
+btnFont "helvetica-medium-r-18.0"
+fgColor rgb 0 0 0
+bgColor rgb 47872 47872 47872
+textColor rgb 0 0 0
+ctlFgColor1 rgb 64256 62208 18944
+ctlFgColor2 rgb 60928 46592 11008
+ctlBgColor1 rgb 52480 24832 0
+ctlBgColor2 rgb 65280 45056 65280
+topShadowColor rgb 44544 19968 48128
+botShadowColor rgb 13312 13056 34304
+showGrid
+snapToGrid
+gridSize 4
+endScreenProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 15
+y 265
+w 419
+h 114
+lineColor rgb 41984 43520 65280
+fill
+fillColor rgb 41984 43520 65280
+lineWidth 0
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 460
+y 15
+w 419
+h 449
+lineColor rgb 22528 37632 65280
+fill
+fillColor rgb 22528 37632 65280
+lineWidth 0
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 465
+y 85
+w 396
+h 30
+controlPv "$(DET):FILENAME"
+format "string"
+font "helvetica-medium-r-18.0"
+fontAlign "left"
+fgColor rgb 0 0 0
+bgColor rgb 47872 47872 47872
+editable
+motifWidget
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 465
+y 130
+w 396
+h 30
+controlPv "$(DET):EXPTIME-SET"
+format "string"
+font "helvetica-medium-r-18.0"
+fontAlign "left"
+fgColor rgb 0 0 0
+bgColor rgb 47872 47872 47872
+editable
+motifWidget
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 465
+y 175
+w 396
+h 30
+controlPv "$(DET):NIMAGE-SET"
+format "string"
+font "helvetica-medium-r-18.0"
+fontAlign "left"
+fgColor rgb 0 0 0
+bgColor rgb 47872 47872 47872
+editable
+motifWidget
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 16
+y 15
+w 419
+h 149
+lineColor rgb 60928 46592 11008
+fill
+fillColor rgb 60928 46592 11008
+lineWidth 0
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 25
+y 335
+w 396
+h 30
+controlPv "$(DET):SPY"
+format "string"
+font "helvetica-medium-r-18.0"
+fontAlign "left"
+fgColor rgb 0 0 0
+bgColor rgb 47872 47872 47872
+editable
+motifWidget
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 15
+y 84
+w 8
+h 40
+font "utopia-medium-r-34.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  ""
+}
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 25
+y 290
+w 396
+h 30
+controlPv "$(DET):COMMAND"
+format "string"
+font "helvetica-medium-r-18.0"
+fontAlign "left"
+fgColor rgb 0 0 0
+bgColor rgb 47872 47872 47872
+editable
+motifWidget
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 15
+y 405
+w 419
+h 59
+lineColor rgb 40960 4608 1792
+fill
+fillColor rgb 40960 4608 1792
+lineWidth 0
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 125
+y 34
+w 250
+h 20
+font "helvetica-medium-r-14.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "(sets default DAC values)"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 26
+y 65
+w 170
+h 20
+font "helvetica-medium-r-14.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "Set Trimfile name"
+}
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 26
+y 85
+w 396
+h 33
+controlPv "$(DET):TRIMFILE"
+format "string"
+font "helvetica-medium-r-18.0"
+fontAlign "left"
+fgColor rgb 0 0 0
+bgColor rgb 44544 44544 44544
+editable
+motifWidget
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 15
+y 190
+w 419
+h 49
+lineColor rgb 0 0 0
+fill
+fillColor rgb 0 0 0
+lineWidth 0
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 465
+y 160
+w 240
+h 15
+font "helvetica-medium-r-12.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "Set the number of frames"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 465
+y 115
+w 170
+h 15
+font "helvetica-medium-r-12.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "Set Exposure Time"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 465
+y 70
+w 140
+h 15
+font "helvetica-medium-r-12.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "Set Image name"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 25
+y 321
+w 240
+h 15
+font "helvetica-medium-r-12.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "Spy the camserver output"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 25
+y 272
+w 210
+h 15
+font "helvetica-medium-r-12.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "Command Input Section"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 465
+y 205
+w 230
+h 15
+font "helvetica-medium-r-12.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "Set the exposure Period"
+}
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 465
+y 220
+w 396
+h 30
+controlPv "$(DET):EXPPER-SET"
+format "string"
+font "helvetica-medium-r-18.0"
+fontAlign "left"
+fgColor rgb 0 0 0
+bgColor rgb 47872 47872 47872
+editable
+motifWidget
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 465
+y 265
+w 396
+h 30
+controlPv "$(DET):NEXPFRM-SET"
+format "string"
+font "helvetica-medium-r-18.0"
+fontAlign "left"
+fgColor rgb 0 0 0
+bgColor rgb 47872 47872 47872
+editable
+motifWidget
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 465
+y 250
+w 370
+h 15
+font "helvetica-medium-r-12.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "Set the number of Exposures per Frame"
+}
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 465
+y 295
+w 420
+h 15
+font "helvetica-medium-r-12.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "Set the delay Time (only in external mode)"
+}
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 465
+y 310
+w 396
+h 30
+controlPv "$(DET):DELAY-SET"
+format "string"
+font "helvetica-medium-r-18.0"
+fontAlign "left"
+fgColor rgb 0 0 0
+bgColor rgb 47872 47872 47872
+editable
+motifWidget
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Text Control)
+object activeXTextDspClass
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 465
+y 40
+w 396
+h 30
+controlPv "$(DET):IMGPATH-SET"
+format "string"
+font "helvetica-medium-r-18.0"
+fontAlign "left"
+fgColor rgb 0 0 0
+bgColor rgb 47872 47872 47872
+editable
+motifWidget
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+major 4
+minor 1
+release 1
+x 465
+y 22
+w 140
+h 15
+font "helvetica-medium-r-12.0"
+fgColor rgb 0 0 0
+bgColor index 3
+useDisplayBg
+value {
+  "Set Image path"
+}
+endObjectProperties
+
+# (Text Monitor)
+object activeXTextDspClass:noedit
+beginObjectProperties
+major 4
+minor 7
+release 0
+x 695
+y 361
+w 100
+h 20
+controlPv "$(DET):STATUS"
+format "decimal"
+font "helvetica-medium-r-14.0"
+fontAlign "left"
+fgColor rgb 22528 37632 65280
+bgColor rgb 47872 47872 47872
+limitsFromDb
+nullColor rgb 60928 46592 11008
+smartRefresh
+fastUpdate
+newPos
+objType "controls"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 480
+y 360
+w 145
+h 25
+fgColor rgb 0 0 0
+onColor rgb 47872 47872 47872
+offColor rgb 47872 47872 47872
+topShadowColor rgb 65280 65280 65280
+botShadowColor rgb 0 0 0
+controlPv "$(DET):EXPOSURE-START"
+pressValue "1"
+releaseValue 
+onLabel "Internal Exposure"
+offLabel "Internal Exposure"
+3d
+useEnumNumeric
+font "helvetica-medium-r-14.0"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 290
+y 426
+w 90
+h 25
+fgColor rgb 0 0 0
+onColor rgb 47872 47872 47872
+offColor rgb 47872 47872 47872
+topShadowColor rgb 65280 65280 65280
+botShadowColor rgb 0 0 0
+controlPv "$(DET):DISCONNECT"
+pressValue "1"
+releaseValue 
+onLabel "Disconnect"
+offLabel "Disconnect"
+3d
+useEnumNumeric
+font "helvetica-medium-r-14.0"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 50
+y 426
+w 90
+h 25
+fgColor rgb 0 0 0
+onColor rgb 47872 47872 47872
+offColor rgb 47872 47872 47872
+topShadowColor rgb 65280 65280 65280
+botShadowColor rgb 0 0 0
+controlPv "$(DET):CONNECT"
+pressValue "1"
+releaseValue 
+onLabel "Connect"
+offLabel "Connect"
+3d
+useEnumNumeric
+font "helvetica-medium-r-14.0"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 35
+y 203
+w 160
+h 25
+fgColor rgb 0 0 0
+onColor rgb 47872 47872 47872
+offColor rgb 47872 47872 47872
+topShadowColor rgb 65280 65280 65280
+botShadowColor rgb 0 0 0
+controlPv "$(DET):CALIBRATE"
+pressValue "1"
+releaseValue 
+onLabel "Calibrate Readback"
+offLabel "Calibrate Readback"
+3d
+useEnumNumeric
+font "helvetica-medium-r-14.0"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 265
+y 203
+w 150
+h 25
+fgColor rgb 0 0 0
+onColor rgb 47872 47872 47872
+offColor rgb 47872 47872 47872
+topShadowColor rgb 65280 65280 65280
+botShadowColor rgb 0 0 0
+controlPv "$(DET):RBD"
+pressValue "1"
+releaseValue 
+onLabel "Digital Readback"
+offLabel "Digital Readback"
+3d
+useEnumNumeric
+font "helvetica-medium-r-14.0"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 26
+y 32
+w 90
+h 25
+fgColor rgb 0 0 0
+onColor rgb 47872 47872 47872
+offColor rgb 47872 47872 47872
+topShadowColor rgb 65280 65280 65280
+botShadowColor rgb 0 0 0
+controlPv "$(DET):DAC-SET"
+pressValue "1"
+releaseValue 
+onLabel "set DAC's"
+offLabel "set DAC's"
+3d
+useEnumNumeric
+font "helvetica-medium-r-14.0"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 26
+y 125
+w 70
+h 25
+fgColor rgb 0 0 0
+onColor rgb 47872 47872 47872
+offColor rgb 47872 47872 47872
+topShadowColor rgb 65280 65280 65280
+botShadowColor rgb 0 0 0
+controlPv "$(DET):TRIM"
+pressValue "1"
+releaseValue 
+onLabel "Trim"
+offLabel "Trim"
+3d
+useEnumNumeric
+font "helvetica-medium-r-14.0"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 480
+y 390
+w 145
+h 25
+fgColor rgb 0 0 0
+onColor rgb 47872 47872 47872
+offColor rgb 47872 47872 47872
+topShadowColor rgb 65280 65280 65280
+botShadowColor rgb 0 0 0
+controlPv "$(DET):EXT-TRIG"
+pressValue "1"
+releaseValue 
+onLabel "External Trigger"
+offLabel "External Trigger"
+3d
+useEnumNumeric
+font "helvetica-medium-r-14.0"
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+major 4
+minor 0
+release 0
+x 480
+y 420
+w 145
+h 25
+fgColor rgb 0 0 0
+onColor rgb 47872 47872 47872
+offColor rgb 47872 47872 47872
+topShadowColor rgb 65280 65280 65280
+botShadowColor rgb 0 0 0
+controlPv "$(DET):EXT-ENBL"
+pressValue "1"
+releaseValue 
+onLabel "External Enable"
+offLabel "External Enable"
+3d
+useEnumNumeric
+font "helvetica-medium-r-14.0"
+endObjectProperties
+
