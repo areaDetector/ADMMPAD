@@ -1,6 +1,6 @@
+file "ADBase_settings.req", P=$(P), R=$(R)
+file "NDFile_settings.req", P=$(P), R=$(R)
 $(P)$(R)DelayTime
-$(P)$(R)TriggerMode
-$(P)$(R)FileIncNumber
 $(P)$(R)FileNameAPS
 $(P)$(R)ChipScale0
 $(P)$(R)ChipScale1
@@ -19,7 +19,6 @@ $(P)$(R)AVGCount
 $(P)$(R)BGSubtract
 $(P)$(R)AVGFile
 $(P)$(R)BGFile
-$(P)$(R)FileFormat
 $(P)$(R)Armed
 $(P)$(R)ImageFileTmot
 $(P)$(R)BadPixelFile
