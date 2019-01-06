@@ -1,6 +1,6 @@
-# Database for the records specific to the Pilatus driver
+# Database for the records specific to the MMPAD driver
 # Mark Rivers
-# July 25, 2008
+# January 6, 2019
 
 include "ADBase.template"
 include "NDFile.template"
@@ -32,112 +32,44 @@ record(mbbi,"$(P)$(R)TriggerMode_RBV") {
     field(FRVL,"4")
     field(FRST,"Alignment")
 }
-#cam command
 
-record(waveform, "$(P)$(R)CamCmd")
+# We redefine the states for ImageMode
+record(mbbo, "$(P)$(R)ImageMode")
 {
-   # field(PINI, "YES")
-    field(DTYP, "asynOctetWrite")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))CAM_CMD")
-    field(FTVL, "CHAR")
-    field(NELM, "256")
-   # field(VAL, "AverageFile")
+   field(ZRST, "Normal")
+   field(ZRVL, "0")
+   field(ONST, "Video")
+   field(ONVL, "1")
+   field(TWST, "")
+   field(TWVL, "")
 }
 
-record(waveform, "$(P)$(R)CamCmd_RBV")
+record(mbbi, "$(P)$(R)ImageMode_RBV")
 {
-    field(DTYP, "asynOctetRead")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))CAM_CMD")
-    field(FTVL, "CHAR")
-    field(NELM, "256")
-    field(SCAN, "I/O Intr")
+   field(ZRST, "Normal")
+   field(ZRVL, "0")
+   field(ONST, "Video")
+   field(ONVL, "1")
+   field(TWST, "")
+   field(TWVL, "")
 }
 
-
-#motors
-
-# addint motor reading
-
-record(busy, "$(P)$(R)GetMot") {
-   field(DTYP, "asynInt32")
-   field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))GET_MOT")
-   field(ZNAM, "Done")
-   field(ONAM, "Acquire")
-   field(VAL,  "0")
-}
-
-record(bi, "$(P)$(R)GetMot_RBV") {
-   field(DTYP, "asynInt32")
-   field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))GET_MOT")
-   field(ZNAM, "Done")
-   field(ZSV,  "NO_ALARM")
-   field(ONAM, "Acquiring")
-   field(OSV,  "MINOR")
-   field(SCAN, "I/O Intr")
-}
-
-
-
-#motor 1
-
-record(ai, "$(P)$(R)MMot1")
+# We redefine the states for the FileFormat records defined in NDFile.template
+record(mbbo, "$(P)$(R)FileFormat")
 {
-  
-   field(DTYP, "asynFloat64")
-   field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MMOT1")
-   field(PREC, "6")
-   field(SCAN, "I/O Intr")
+    field(ZRST, "RAW")
+    field(ZRVL, "0")
+    field(ONST, "TIFF")
+    field(ONVL, "1")
 }
 
-#record(ai, "$(P)$(R)MMot1_RBV")
-#{
-#   field(DTYP, "asynFloat64")
-#   field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MMOT1")
-#   field(PREC, "6")
-#   field(SCAN, "I/O Intr")
-#}
-
-#motor 2
-
-record(ai, "$(P)$(R)MMot2")
+record(mbbi, "$(P)$(R)FileFormat_RBV")
 {
-  
-   field(DTYP, "asynFloat64")
-   field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MMOT2")
-   field(PREC, "6")
-   field(SCAN, "I/O Intr")
+    field(ZRST, "RAW")
+    field(ZRVL, "0")
+    field(ONST, "TIFF")
+    field(ONVL, "1")
 }
-
-#record(ai, "$(P)$(R)MMot2_RBV")
-#{
-#   field(DTYP, "asynFloat64")
-#   field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MMOT2")
-#   field(PREC, "6")
-#   field(SCAN, "I/O Intr")
-#}
-
-#motor 3
-
-record(ai, "$(P)$(R)MMot3")
-{
-  
-   field(DTYP, "asynFloat64")
-   field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MMOT3")
-   field(PREC, "6")
-   field(SCAN, "I/O Intr")
-}
-
-#record(ai, "$(P)$(R)MMot3_RBV")
-#{
-#   field(DTYP, "asynFloat64")
-#   field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MMOT3")
-#   field(PREC, "6")
-#   field(SCAN, "I/O Intr")
-#}
-
-
-
-#testout
 
 record(longin, "$(P)$(R)ROI_Sum")
 {
@@ -224,32 +156,12 @@ record(longout, "$(P)$(R)FileIncNumber_Sync")
     field(OUT,  "$(P)$(R)FileIncNumber PP")
 }
 
-
-record(waveform, "$(P)$(R)FileNameAPS")
-{
-    field(DTYP, "asynOctetRead")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))FILENAMEAPS")
-    field(FTVL, "CHAR")
-    field(NELM, "256")
-    field(SCAN, "I/O Intr")
-}
-
-#record(waveform, "$(P)$(R)FileNameAPS_RBV")
-#{
-#    field(DTYP, "asynOctetRead")
-#    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))FILENAMEAPS")
-#    field(FTVL, "CHAR")
-#    field(NELM, "256")
-#    field(SCAN, "I/O Intr")
-#}
-
 record(longout, "$(P)$(R)ChipScale0")
 {
-	#field(PINI, "YES")
+	  field(PINI, "YES")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))CHIP_SCALE0")
-	field(VAL,  "1")
-   # field(SCAN, "I/O Intr")
+	  field(VAL,  "1")
 }
 record(longin, "$(P)$(R)ChipScale0_RBV")
 {
@@ -261,10 +173,9 @@ record(longin, "$(P)$(R)ChipScale0_RBV")
 
 record(longout, "$(P)$(R)ChipScale1")
 {
-    #field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))CHIP_SCALE1")
-   # field(SCAN, "I/O Intr")
     field(VAL,  "1")
 }
 record(longin, "$(P)$(R)ChipScale1_RBV")
@@ -277,10 +188,9 @@ record(longin, "$(P)$(R)ChipScale1_RBV")
 
 record(longout, "$(P)$(R)ChipScale2")
 {
-   # field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))CHIP_SCALE2")
-   # field(SCAN, "I/O Intr")
     field(VAL,  "1")
 }
 record(longin, "$(P)$(R)ChipScale2_RBV")
@@ -292,10 +202,9 @@ record(longin, "$(P)$(R)ChipScale2_RBV")
 
 record(longout, "$(P)$(R)ChipScale3")
 {
-   # field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))CHIP_SCALE3")
-   # field(SCAN, "I/O Intr")
     field(VAL,  "1")
 }
 record(longin, "$(P)$(R)ChipScale3_RBV")
@@ -307,10 +216,9 @@ record(longin, "$(P)$(R)ChipScale3_RBV")
 
 record(longout, "$(P)$(R)ChipScale4")
 {
-   # field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))CHIP_SCALE4")
-    #field(SCAN, "I/O Intr")
     field(VAL,  "1")
 }
 record(longin, "$(P)$(R)ChipScale4_RBV")
@@ -322,10 +230,9 @@ record(longin, "$(P)$(R)ChipScale4_RBV")
 
 record(longout, "$(P)$(R)ChipScale5")
 {
-   #field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))CHIP_SCALE5")
-   # field(SCAN, "I/O Intr")
     field(VAL,  "1")
 }
 record(longin, "$(P)$(R)ChipScale5_RBV")
@@ -335,16 +242,15 @@ record(longin, "$(P)$(R)ChipScale5_RBV")
     field(SCAN, "I/O Intr")
 }
 # background flag
-
-record(longout, "$(P)$(R)BackSubFlag")
+record(bo, "$(P)$(R)BackSubFlag")
 {
-   # field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BACKSUB_FLAG")
-   # field(SCAN, "I/O Intr")
-    field(VAL,  "0")
+    field(ZNAM, "Disable")
+    field(ONAM, "Enable")
 }
-record(longin, "$(P)$(R)BackSubFlag_RBV")
+record(bi, "$(P)$(R)BackSubFlag_RBV")
 {
     field(DTYP, "asynInt32")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BACKSUB_FLAG")
@@ -352,33 +258,14 @@ record(longin, "$(P)$(R)BackSubFlag_RBV")
 }
 
 
-#record(busy, "$(P)$(R)BackSubFlag") {
-   #field(DTYP, "asynInt32")
-   #field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BACKSUB_FLAG")
-   #field(ZNAM, "Back Sub Off")
-   #field(ONAM, "Back Sub On")
-   #field(VAL,  "0")
-#}
-
-#record(bi, "$(P)$(R)BackSubFlag_RBV") {
-   #field(DTYP, "asynInt32")
-   #field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BACKSUB_FLAG")
-   #field(ZNAM, "Back Sub Off")
-   #field(ZSV,  "NO_ALARM")
-   #field(ONAM, "Back Sub On")
-   #field(OSV,  "MINOR")
-   #field(SCAN, "I/O Intr")
-#}
-
-
-
 # mildisp controls
 record(longout, "$(P)$(R)MilDispBitShift")
 {
-   # field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_BITSHIFT")
-   # field(SCAN, "I/O Intr")
+    field(DRVL, "-2")
+    field(DRVH, "12")
     field(VAL,  "4")
 }
 record(longin, "$(P)$(R)MilDispBitShift_RBV")
@@ -388,47 +275,28 @@ record(longin, "$(P)$(R)MilDispBitShift_RBV")
     field(SCAN, "I/O Intr")
 }
 
-record(longout, "$(P)$(R)MilDispOn")
+record(bo, "$(P)$(R)MilDispOn")
 {
-   # field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_ON")
-   # field(SCAN, "I/O Intr")
-    field(VAL,  "0")
+    field(ZNAM, "Disable")
+    field(ONAM, "Enable")
 }
-record(longin, "$(P)$(R)MilDispOn_RBV")
+record(bi, "$(P)$(R)MilDispOn_RBV")
 {
     field(DTYP, "asynInt32")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_ON")
+    field(ZNAM, "Disable")
+    field(ONAM, "Enable")
     field(SCAN, "I/O Intr")
 }
 
-
-#record(busy, "$(P)$(R)MilDispOn") {
-   #field(DTYP, "asynInt32")
-   #field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_ON")
-   #field(ZNAM, "mildisp Off")
-   #field(ONAM, "mildisp On")
-   #field(VAL,  "0")
-#}
-
-#record(bi, "$(P)$(R)MilDispOn_RBV") {
-   #field(DTYP, "asynInt32")
-   #field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_ON")
-   #field(ZNAM, "mildisp Off")
-   #field(ZSV,  "NO_ALARM")
-   #field(ONAM, "mildisp On")
-   #field(OSV,  "MINOR")
-   #field(SCAN, "I/O Intr")
-#}
-
-
 record(longout, "$(P)$(R)MilDispOffset")
 {
-   # field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynInt32")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_OFFSET")
-   # field(SCAN, "I/O Intr")
     field(VAL,  "20")
 }
 record(longin, "$(P)$(R)MilDispOffset_RBV")
@@ -437,77 +305,7 @@ record(longin, "$(P)$(R)MilDispOffset_RBV")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_OFFSET")
     field(SCAN, "I/O Intr")
 }
-
 ## end midisp controls
-
-
-
-
-
-record(longout, "$(P)$(R)VideoModeOn")
-{
-   # field(PINI, "YES")
-    field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))VIDEO_MODE_ON")
-   # field(SCAN, "I/O Intr")
-    field(VAL,  "0")
-}
-record(longin, "$(P)$(R)VideoModeOn_RBV")
-{
-    field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))VIDEO_MODE_ON")
-    field(SCAN, "I/O Intr")
-}
-
-#record(busy, "$(P)$(R)MilDispOn") {
-   #field(DTYP, "asynInt32")
-   #field(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_ON")
-   #field(ZNAM, "mildisp Off")
-   #field(ONAM, "mildisp On")
-   #field(VAL,  "0")
-#}
-
-#record(bi, "$(P)$(R)MilDispOn_RBV") {
-   #field(DTYP, "asynInt32")
-   #field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_ON")
-   #field(ZNAM, "mildisp Off")
-   #field(ZSV,  "NO_ALARM")
-   #field(ONAM, "mildisp On")
-   #field(OSV,  "MINOR")
-   #field(SCAN, "I/O Intr")
-#}
-
-
-
-record(ao, "$(P)$(R)VideoModeFTime")
-{
-	#field(PINI, "YES")
-    field(DTYP, "asynFloat64")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))VIDEO_MODE_FTIME")
-    field(VAL,  "0.001")
-    field(PREC, "6")
-}
-record(ai, "$(P)$(R)VideoModeFTime_RBV")
-{
-    field(DTYP, "asynFloat64")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))VIDEO_MODE_FTIME")
-    field(PREC, "6")
-    field(SCAN, "I/O Intr")
-}
-
-#record(longout, "$(P)$(R)AVGAcquire")
-#{
-##	field(PINI, "YES")
-#	field(DTYP, "asynInt32")
-#	field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))AVGACQUIRE")
-#	field(VAL,	"0")
-#}
-#record(longin, "$(P)$(R)AVGAcquire_RBV")
-#{
-#	field(DTYP, "asynInt32")
-#	field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))AVGACQUIRE")
-#	field(SCAN, "I/O Intr")
-#}
 
 
 record(busy, "$(P)$(R)AVGAcquire") {
@@ -517,7 +315,6 @@ record(busy, "$(P)$(R)AVGAcquire") {
    field(ONAM, "Acquire")
    field(VAL,  "0")
 }
-
 record(bi, "$(P)$(R)AVGAcquire_RBV") {
    field(DTYP, "asynInt32")
    field(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))AVGACQUIRE")
@@ -527,8 +324,6 @@ record(bi, "$(P)$(R)AVGAcquire_RBV") {
    field(OSV,  "MINOR")
    field(SCAN, "I/O Intr")
 }
-
-
 
 
 record(longout, "$(P)$(R)ResetFrame")
@@ -544,8 +339,6 @@ record(longin, "$(P)$(R)Reset_Frame_RBV")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))RESET_FRAME")
     field(SCAN, "I/O Intr")
 }
-
-
 
 
 record(longout, "$(P)$(R)AVGCount")
@@ -576,6 +369,7 @@ record(longin, "$(P)$(R)BGSubtract_RBV")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BG_SUBTRACT")
     field(SCAN, "I/O Intr")
 }
+
 record(waveform, "$(P)$(R)AVGFile")
 {
    # field(PINI, "YES")
@@ -614,24 +408,7 @@ record(waveform, "$(P)$(R)BGFile_RBV")
     field(SCAN, "I/O Intr")
 }
 
-# We redefine the states for the FileFormat records defined in NDFile.template
-record(mbbo, "$(P)$(R)FileFormat")
-{
-    field(ZRST, "TIFF")
-    field(ZRVL, "0")
-    field(ONST, "Invalid")
-    field(ONVL, "1")
-}
-
-record(mbbi, "$(P)$(R)FileFormat_RBV")
-{
-    field(ZRST, "TIFF")
-    field(ZRVL, "0")
-    field(ONST, "Invalid")
-    field(ONVL, "1")
-}
-
-# Armed flag, which indicates Pilatus is ready for external triggers
+# Armed flag, which indicates MMPAD is ready for external triggers
 record(bi, "$(P)$(R)Armed")
 {
     field(DTYP, "asynInt32")
@@ -644,7 +421,7 @@ record(bi, "$(P)$(R)Armed")
 # Delay time in External Trigger mode.
 record(ao, "$(P)$(R)DelayTime")
 {
-   # field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))DELAY_TIME")
     field(EGU,  "s")
@@ -664,73 +441,13 @@ record(ai, "$(P)$(R)DelayTime_RBV")
 # Timeout waiting for image to be written to file system
 record(ao, "$(P)$(R)ImageFileTmot")
 {
-    # field(PINI, "YES")
+    field(PINI, "YES")
     field(DTYP, "asynFloat64")
     field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))IMAGE_FILE_TMOT")
     field(DESC, "Timeout for image file")
     field(VAL,  "20")
     field(EGU,  "s")
     field(PREC, "3")
-}
-
-# Bad pixel file
-record(waveform, "$(P)$(R)BadPixelFile")
-{
-  #  field(PINI, "YES")
-    field(DTYP, "asynOctetWrite")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BAD_PIXEL_FILE")
-    field(FTVL, "CHAR")
-    field(NELM, "256")
-}
-
-# Number of bad pixels
-record(longin, "$(P)$(R)NumBadPixels")
-{
-    field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))NUM_BAD_PIXELS")
-    field(DESC, "Number of bad pixels")
-    field(SCAN, "I/O Intr")
-}
-
-# Flat field file
-record(waveform, "$(P)$(R)FlatFieldFile")
-{
-   # field(PINI, "YES")
-    field(DTYP, "asynOctetWrite")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))FLAT_FIELD_FILE")
-    field(FTVL, "CHAR")
-    field(NELM, "256")
-}
-
-# Minimum flat field value
-record(longout, "$(P)$(R)MinFlatField")
-{
-  #  field(PINI, "YES")
-    field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MIN_FLAT_FIELD")
-    field(DESC, "Minimum flat field value")
-    field(VAL,  "100")
-    field(EGU,  "Counts")
-}
-
-record(longin, "$(P)$(R)MinFlatField_RBV")
-{
-    field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MIN_FLAT_FIELD")
-    field(DESC, "Minimum flat field value")
-    field(EGU,  "Counts")
-    field(SCAN, "I/O Intr")
-}
-
-# Flat field valid flag.
-record(bi, "$(P)$(R)FlatFieldValid")
-{
-    field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))FLAT_FIELD_VALID")
-    field(DESC, "Flat field valid")
-    field(ZNAM, "No")
-    field(ONAM, "Yes")
-    field(SCAN, "I/O Intr")
 }
 
 # asyn record for interactive communication with camserver
@@ -740,7 +457,3 @@ record(asyn, "$(P)$(R)CamserverAsyn")
     field(IMAX, "64")
     field(OMAX, "64")
 }
-
-
-
-
