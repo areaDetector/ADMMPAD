@@ -1,0 +1,420 @@
+# mmpad_cd_te_2018.mac
+#  Phil Sorensen - 2002/6
+#  Mark Tate 2005/10 - modify for FLI cameras
+#  Darren Dale 2012/05 - complete rewrite for mmpad
+#
+#  Arthur Woll 2012/06 : added _mmpad_getcounts for macro counters on ROIs of MMPAD (G2)
+#
+# Kate Shanks 2014/07: annotate for clarity - will denote my comments with initials KSS
+#	Mark Tate 2014/08: update for new mmpad software
+#
+# Mark Tate 2015/05: update for new software
+# Weiss/Shanks/Ruff/Islam APS Aug 2015
+# Mark Tate 2018/09: add functions for CdTe version
+#
+# USE these macros
+#   1. To open and configure the connection to camserver, type "mmpad_setup"
+#	1a. set exposure time "mmpad_exposure_time <time>"
+#	1a1. a CT time command will compute num_frames=time / mmpad_exposure_time
+#	1b. take backgrounds "mmpad_dark dark_filename num_darkframes"
+#   2. To start collecting an image with each count, type "mmpad_on"
+#   3. To stop collecting images type "mmpad_off"
+#   4. To close the connection to camserver, type "mmpad_close"
+#	5. mmpad_log [scale] [offset] will put grab_window into log display - scale = power of 10
+#	6. mmpad_mildisp [bitshift] [offset] puts display in linear mode
+#	7. mmpad_saveblocks - data storage as raw blocks instead of tifs - will store N images in one file
+#	8. mmpad_savetifs - store every frame as a tif
+#	9. mmpad_save_avg_tif 0/1 - store the average of num_frames as well as individual frames
+#	10. mmpad_roi x y dx dy will make a ROI box which is 2dx * 2dy in size centered on x,y
+#	11. mmpad_showroi - flashes ROI box on grab window
+
+# TO DO: wait on proper return from camserver for end of exposure instead of relying on timer set in SPEC
+
+################################################################
+#SCALERS        DEVICE   ADDR  <>MODE  NUM                                 <>TYPE
+#    YES                    0            8      NI PCI 6601/6602 as Counter/Timer
+#    YES         mmpad      -            4                          Macro Counter
+#
+#Scaler (Counter) Configuration
+#                                                                                                                       
+#Numb        Name  Mnemonic  <>Spectro  <>Device  Unit Chan  <>Use As    Scale
+#   0     Seconds       sec     common    NI660x     0    0  timebase        1
+#   1          I0        I0     common    NI660x     0    1   counter        1
+#   2          I1        I1     common    NI660x     0    2   counter        1
+#   3          I2        I2     common    NI660x     0    3   monitor        1
+#   4         det       det     common    NI660x     0    5   counter        1
+#   5       ready     ready     common    NI660x     0    7   counter   100000
+#   6       diode     diode     common    NI660x     0    4   counter        1
+#   7     pad_sum   pad_sum     common   MAC_CNT     0    0   counter        1
+#   8      pad_ul    pad_ul     common   MAC_CNT     0    1   counter        1
+#   9      pad_ur    pad_ur     common   MAC_CNT     0    2   counter        1
+#  10      pad_ll    pad_ll     common   MAC_CNT     0    3   counter        1
+#  11      pad_lr    pad_lr     common   MAC_CNT     0    4   counter        1
+#########################################################################
+
+
+global MMPAD_ROIS MMPAD_ROIS_DONE
+MMPAD_ROIS_DONE = 0
+
+if (!MMPAD_ROIS["DARK_NPIXELS"]) {
+   MMPAD_ROIS["DARK_NPIXELS"] = 1
+}
+
+global MMPAD
+if (!MMPAD["exposure_time"]) {
+    MMPAD["exposure_time"] = .01
+}
+if (!MMPAD["bitshift"]) {
+    MMPAD["bitshift"] = 2
+}
+if (!MMPAD["offset"]) {
+    MMPAD["offset"] = 0
+}
+if (!MMPAD["server"]) {
+    MMPAD["server"] = "164.54.106.69:41234"
+}
+if (!MMPAD["roix"]) {
+    MMPAD["roix"] = 188
+}
+if (!MMPAD["roiy"]) {
+    MMPAD["roiy"] = 188
+}
+if (!MMPAD["roidx"]) {
+    MMPAD["roidx"] = 5
+}
+if (!MMPAD["roidy"]) {
+    MMPAD["roidy"] = 5
+}
+if (!MMPAD["logscale"]) {
+    MMPAD["logscale"] = 7
+}
+if (!MMPAD["logoffset"]) {
+    MMPAD["logoffset"] = 0
+}
+if (!MMPAD["logdisplay"]) {
+    MMPAD["logdisplay"] = 1
+}
+if (!MMPAD["save_tif_flag"]) {
+    MMPAD["save_tif_flag"] = 1
+}
+if (!MMPAD["save_avg_tif"]) {
+    MMPAD["save_avg_tif"] = 0
+}
+if (!MMPAD["mtrigs"]) {
+    MMPAD["mtrigs"] = 1
+}
+	
+
+def von 'camserver(sprintf("videomodeon %f",MMPAD["exposure_time"]))'
+
+def voff 'camserver("videomodeoff")'
+
+#KSS - retrieves quadrant sum computation
+#Updated as of 8/2014.
+#ROIS are upper left (UL), upper right (UR), lower left (LL), lower right (LR)
+#GetComputation returns: total intensity in each ROI; total sum UL+UR+LL+LR; (UL+UR)-(LL+LR)/total sum; (UL+LL)-(UR+LR)/total sum.
+#JRuff- Need to config a scalar called "pad_sum" for this to work properly
+#12 OK SUM 0 UL 0 UR 0 LL 0 LR 0
+#12 OK DIFX 0.000000 DIFY 0.000000 CENX 23 CENY 40 DELX 10 DELY 9
+def _mmpad_getcounts '	
+   local ret_str, split_str1 split_str2
+   if (!(MMPAD_ROIS_DONE)){
+        split_str1[0] = ""
+        split_str2[0] = ""
+        sock_put(MMPAD["server"], "GetComputation\n");
+	ret_str = sock_get(MMPAD["server"])
+	split(ret_str, split_str1)
+	if (index(split_str1[8], "LL")) {
+	    MMPAD_ROIS["pad_ll"] = split_str1[9]
+	} else {
+	    print "Error in _mmpad_getcounts: string LL not found"
+        }
+	if (index(split_str1[10], "LR")) {
+	    MMPAD_ROIS["pad_lr"] = split_str1[11]
+	} else {
+	    print "Error in _mmpad_getcounts: string LR not found"
+	} 		
+	if (index(split_str1[4], "UL")) {
+	    MMPAD_ROIS["pad_ul"] = split_str1[5]
+	} else {
+	    print "Error in _mmpad_getcounts: string UL not found"
+	}
+	if (index(split_str1[6], "UR")) {
+	    MMPAD_ROIS["pad_ur"] = split_str1[7]
+	} else {
+	    print "Error in _mmpad_getcounts: string UR not found"
+	}
+	if (index(split_str1[2], "SUM")) {
+	    MMPAD_ROIS["pad_sum"] = split_str1[3]
+   	} else {
+	    print "Error in _mmpad_getcounts: string SUM not found"
+	}
+	MMPAD_ROIS_DONE = 1
+   }
+   S[pad_sum]=MMPAD_ROIS["pad_sum"]
+   #print "End of _mmpad_getcounts"
+'
+
+#KSS - send a command to camserver process on MMPAD computer
+def camserver(cmd, wait_for_it) '{
+    sock_put(MMPAD["server"], sprintf("%s\n", cmd))
+    sleep(wait_for_it)
+}'
+
+#KSS - Set up MMPAD: initialize detector, set image path name.
+#Updated as of 8/2014.
+def mmpad_setup '{
+    local str str_n val
+
+    if (!MMPAD["initialized"]) {
+        _mmpad_init;
+    }
+
+    val = 0
+    while(!val) {
+        val = getval("Remote path for images (must exist)", MMPAD["path"]);
+    }
+    MMPAD["path"] = val
+
+    mmpad_exposure_time;
+
+#    MMPAD["hardware_trigger"] = yesno("Enable hardware trigger?", MMPAD["hardware_trigger"]);
+#    camserver(sprintf("frametriggersource %d", 2-MMPAD["hardware_trigger"]))
+}'
+
+#KSS - initialize MMPAD on start-up. 
+#Updated as of 8/2014.
+def _mmpad_init '{
+    local val
+
+    val = 0
+    while(!val) {
+        val = getval("Enter MMPAD server", MMPAD["server"]);
+    }
+    MMPAD["server"] = val
+
+    sock_par(MMPAD["server"], "connect");
+    sock_par(MMPAD["server"], "timeout", 25.0)
+    camserver("ldcmndfile startup.cmd", 6)
+
+    if (MMPAD["dark_file"]) {
+        camserver(sprintf("mmpadcommand milbackimg %s_avg.tif", MMPAD["dark_file"]), 1)
+        camserver("mmpadcommand milbacksub 1", 0.1)
+    }
+
+    MMPAD["initialized"] = 1
+}'
+
+#MWT - inserts mmpad macros into spec CT macros (and initialize on first use)
+def mmpad_on '{
+    if (!MMPAD["initialized"]) {
+        mmpad_setup;
+    }
+
+    cdef("user_precount", "_mmpad_precount();", "_mmpad_mac_")
+    cdef("user_postcount", "_mmpad_postcount();", "_mmpad_mac_")
+    cdef("user_getcounts", "_mmpad_getcounts;" , "_mmpad_mac_")
+}'
+
+
+#MWT- removes mmpad macros from CT macros - does not disconnect from camserver
+def mmpad_off '{
+    cdef("", "", "_mmpad_mac_", "delete")
+}'
+
+#KSS - close connection with MMPAD - kept separate from mmpad_off to avoid excessive open/close of the connection
+def mmpad_close '{
+    mmpad_off;
+    MMPAD["initialized"] = 0
+    sock_par(MMPAD["server"], "close");
+}'
+
+
+#mmpad_off;
+#mmpad_setup;
+
+#KSS - change settings for MMPAD image display
+#Updated as of 8/2014.
+# use: mmpad_mildisp bitshift offset
+# bitshift=-2 shows the lowest bits
+# bitshift=16 shows the highest bits
+# offset=10 will usually give a nice display for background-subtracted images 
+def mmpad_mildisp '{
+	if(MMPAD["logdisplay"] > 0) {
+		MMPAD["logdisplay"] = 0
+		camserver(sprintf("padcom loglin 0 %f %f", MMPAD["logscale"], MMPAD["logoffset"]),0.1)
+	}
+    if ($# < 2) {
+        MMPAD["bitshift"] = getval("Enter bitshift", MMPAD["bitshift"])
+        MMPAD["offset"] = getval("Enter offset", MMPAD["offset"])
+    } else {
+        MMPAD["bitshift"] = $1
+        MMPAD["offset"] = $2
+    }
+    camserver(sprintf("mmpadcommand mildisp %d 1 %d", MMPAD["bitshift"], MMPAD["offset"]))
+}'
+
+#KSS - change MMPAD exposure time - spec variable - does not forward to camserver immediately
+def mmpad_exposure_time '{
+    local ctime
+    if ($1 > 0) {
+        ctime = $1
+    }
+    while (ctime <= 0) {
+        ctime = getval("Enter MMPAD exposure time", MMPAD["exposure_time"]);
+    }
+
+    MMPAD["exposure_time"] = ctime
+}'
+
+#KSS - Take dark current images. Define dark-image filename and #of frames- collect frames- save individual files- save average file as filename_avg.tif. 
+# At the end of the macro, the background-subtract flag is set so that subsequent images will be background-subtracted before being saved to disk.
+def mmpad_dark '{
+    local darkfile darkframes fullname
+    darkfile = $1
+    darkframes = $2
+    while (!darkfile) {
+        darkfile = getval("Name for new dark file", 0);        
+    }
+    while (!darkframes) {
+        darkframes = getval("Number of dark frames", 0);
+    }
+
+#    closes
+
+    MMPAD["dark_file"] = sprintf("%s/%s", MMPAD["path"], darkfile)
+
+    camserver("mmpadcommand milbacksub 0", 0.1)
+    camserver(sprintf("set_take_n %f 0 %d", MMPAD["exposure_time"], darkframes), 0.1)
+    camserver(sprintf("avgexp %s %d", MMPAD["dark_file"], darkframes), (MMPAD["exposure_time"]+0.01)*darkframes*1.5+5)
+    camserver(sprintf("mmpadcommand milbackimg %s_avg.tif", MMPAD["dark_file"]), 1)
+    camserver("mmpadcommand milbacksub 1", 0.1)
+}'
+
+def mmpad_ROI '{
+    if ($# < 2) {
+        MMPAD["roix"] = getval("Enter ROI x center", MMPAD["roix"])
+        MMPAD["roiy"] = getval("Enter ROI y center", MMPAD["roiy"])
+        MMPAD["roidx"] = getval("Enter ROI x 1/2 width", MMPAD["roidx"])
+        MMPAD["roidy"] = getval("Enter ROI y 1/2 width", MMPAD["roidy"])
+    } else if($# == 2) {
+        MMPAD["roix"] = $1
+        MMPAD["roiy"] = $2
+    } else {
+        MMPAD["roix"] = $1
+        MMPAD["roiy"] = $2
+        MMPAD["roidx"] = $3
+        MMPAD["roidy"] = $4
+    }
+    camserver(sprintf("padcom roimask box 0 %d %d %d %d", MMPAD["roix"], MMPAD["roiy"], MMPAD["roidx"], MMPAD["roidy"]), 0.1)
+}'
+
+def mmpad_showROI '{
+    camserver("padcom showroimask 0 1",0.1)
+}'
+
+def mmpad_log '{
+	MMPAD["logdisplay"] = 1
+    if ($# < 1) {
+        MMPAD["logscale"] = getval("Enter logscale", MMPAD["logscale"])
+        MMPAD["logoffset"] = getval("Enter logoffset", MMPAD["logoffset"])
+    } else {
+        MMPAD["logscale"] = $1
+        MMPAD["logoffset"] = $2
+    }
+    camserver(sprintf("padcom loglin 1 %f %f", MMPAD["logscale"], MMPAD["logoffset"]),0.1)
+}'
+
+def mmpad_saveblocks '{
+    camserver("filestore 1 5",0.1)
+    MMPAD["save_tif_flag"] = 0
+}'
+
+def mmpad_savetifs '{
+    camserver("filestore 1 1",0.1)
+    MMPAD["save_tif_flag"] = 1
+}'
+
+def mmpad_save_avg_tif '{
+    if ($# < 1) {
+        MMPAD["save_avg_tif"] = getval("Enter save_avg_tif_flag 0=don\'t save/1=save avg", MMPAD["save_avg_tif"])
+    } else {
+        MMPAD["save_avg_tif"] = $1
+    }
+}'
+
+
+
+#KSS - data taking sequence used at CHESS. The user gives the total count time desired (COUNT_TIME) and the macro computes the number of frames needed based on the pre-set MMPAD exposure time. The shutter is opened (opens_now) and then the MMPAD takes the desired series of images.
+#Updated as of 8/2014.
+def _mmpad_precount() '{
+    local num_frames file_name
+
+    str[0] = ""
+    str_n = split(DATAFILE, str, "/")
+    file_name = str[str_n-1]
+
+    num_frames = COUNT_TIME/MMPAD["exposure_time"] # less dead time?
+    file_name = sprintf("%s/%s", MMPAD["path"], file_name)
+
+    sock_par(MMPAD["server"], "flush")
+#	camserver(sprintf("frametriggersource %d", 2-MMPAD["hardware_trigger"])) # no HW trigger at ESRF
+    camserver(sprintf("set_take_n %f %f %d", MMPAD["exposure_time"], 0, num_frames), 0.05)
+    sock_get(MMPAD["server"])
+
+#    opens_now
+#	opens
+    # build a unique file name for the image (camserver will take care of subimages)
+    if((MMPAD["save_avg_tif"] > 0) && (num_frames > 1))
+    {
+		camserver(sprintf("setavgexp %s_%03d_%03d.tif %d", file_name, SCAN_N, NPTS, num_frames),0.015)
+    }
+    camserver(sprintf("Exposure %s_%03d_%03d.tif", file_name, SCAN_N, NPTS), 0.015)
+    sock_get(MMPAD["server"])
+    MMPAD_ROIS_DONE = 1
+}'
+
+def _mmpad_postcount() '{
+    waitcount
+    sock_get(MMPAD["server"])   # lack of zero at end allows capture of extra blank line
+#    closes
+    #print "Inside _mmpad_postcount()"
+    MMPAD_ROIS_DONE = 0
+}'
+
+# MWT - 2018 - commands for mmpad-CdTe system
+def mmpad_resethv() '{
+# a reset of the CdTe sensor sets the bias to -2V for 60 s and then back to 400 V, waiting 60 s to settle
+    camserver("padcom hvset -2",60)
+    camserver("padcom hvset 400",60)
+}'
+
+def mmpad_poweronv2() '{
+    camserver("ldcmndfile mmpadpower_v2.cmd",6)
+    camserver("padcom hvoff",1)
+    camserver("padcom hvset 2",1)
+    camserver("padcom hvon",1)
+}'
+
+def mmpad_power_init() '{
+# call this only once after a cold start of the FPGA
+    camserver("padcom power_init",0.1)
+}'
+
+def mmpad_parkhv() '{
+# 2 volts on the sensor is nominally unbiased (about vref)
+    camserver("padcom hvset 2)
+}'
+
+def mmpad_hwmode() '{
+# set up HW trigger - mtrigs is the number of triggers expected for a sequence.
+# each trigger will take N frames as configured by "Set_Take_N exp_time ftime N"
+# when "Exposure filename" command is issued
+    camserver("padcom settrigger 2 0 0",0.02)
+    camserver(sprintf("padcom mtrigger 1 %d",MMPAD["mtrigs"]),0.02)
+}'
+
+def mmpad_bgmode() '{
+# set up software trigger mode - used for taking backgrounds
+    camserver("padcom settrigger 4 0 0",0.02)
+}'
