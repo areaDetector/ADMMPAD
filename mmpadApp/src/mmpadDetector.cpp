@@ -126,8 +126,6 @@ class mmpadDetector : public ADDriver
   protected:
     int mmpadDelayTime;
 #define FIRST_mmpad_PARAM mmpadDelayTime
-    int mmpadItime;
-    int mmpadFtime;
     int mmpadArmed;
     int mmpadImageFileTmot;
     int mmpadAVGAcquire;
