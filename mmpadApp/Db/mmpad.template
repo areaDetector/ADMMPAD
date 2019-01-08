@@ -157,6 +157,23 @@ record(bi, "$(P)$(R)MilDispOn_RBV")
     field(SCAN, "I/O Intr")
 }
 
+record(bo, "$(P)$(R)MilDispLog")
+{
+    field(PINI, "YES")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_LOG")
+    field(ZNAM, "Linear")
+    field(ONAM, "Log")
+}
+record(bi, "$(P)$(R)MilDispLog_RBV")
+{
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_LOG")
+    field(ZNAM, "Linear")
+    field(ONAM, "Log")
+    field(SCAN, "I/O Intr")
+}
+
 record(longout, "$(P)$(R)MilDispOffset")
 {
     field(PINI, "YES")
@@ -168,6 +185,19 @@ record(longin, "$(P)$(R)MilDispOffset_RBV")
 {
     field(DTYP, "asynInt32")
     field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_OFFSET")
+    field(SCAN, "I/O Intr")
+}
+record(longout, "$(P)$(R)MilDispScale")
+{
+    field(PINI, "YES")
+    field(DTYP, "asynInt32")
+    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_SCALE")
+    field(VAL,  "1")
+}
+record(longin, "$(P)$(R)MilDispScale_RBV")
+{
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))MILDISP_SCALE")
     field(SCAN, "I/O Intr")
 }
 ## end midisp controls
@@ -189,22 +219,6 @@ record(bi, "$(P)$(R)AVGAcquire_RBV") {
    field(OSV,  "MINOR")
    field(SCAN, "I/O Intr")
 }
-
-
-record(longout, "$(P)$(R)ResetFrame")
-{
-#	field(PINI, "YES")
-    field(DTYP, "asynInt32")
-    field(OUT,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))RESET_FRAME")
-    field(VAL,	"0")
-}
-record(longin, "$(P)$(R)Reset_Frame_RBV")
-{
-    field(DTYP, "asynInt32")
-    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))RESET_FRAME")
-    field(SCAN, "I/O Intr")
-}
-
 
 record(longout, "$(P)$(R)AVGCount")
 {
