@@ -8,7 +8,7 @@ display {
 		x=506
 		y=73
 		width=1070
-		height=810
+		height=860
 	}
 	clr=14
 	bclr=4
@@ -550,7 +550,7 @@ text {
 composite {
 	object {
 		x=5
-		y=695
+		y=745
 		width=350
 		height=110
 	}
@@ -1268,134 +1268,6 @@ menu {
 		bclr=51
 	}
 }
-"text update" {
-	object {
-		x=245
-		y=642
-		width=80
-		height=18
-	}
-	monitor {
-		chan="$(P)$(R)MilDispOffset_RBV"
-		clr=54
-		bclr=4
-	}
-	limits {
-	}
-}
-"text entry" {
-	object {
-		x=180
-		y=641
-		width=60
-		height=20
-	}
-	control {
-		chan="$(P)$(R)MilDispOffset"
-		clr=14
-		bclr=51
-	}
-	limits {
-	}
-}
-text {
-	object {
-		x=115
-		y=641
-		width=60
-		height=20
-	}
-	"basic attribute" {
-		clr=14
-	}
-	textix="Offset"
-	align="horiz. right"
-}
-text {
-	object {
-		x=115
-		y=616
-		width=60
-		height=20
-	}
-	"basic attribute" {
-		clr=14
-	}
-	textix="Enable"
-	align="horiz. right"
-}
-"text update" {
-	object {
-		x=245
-		y=617
-		width=80
-		height=18
-	}
-	monitor {
-		chan="$(P)$(R)MilDispOn_RBV"
-		clr=54
-		bclr=4
-	}
-	format="string"
-	limits {
-	}
-}
-menu {
-	object {
-		x=180
-		y=616
-		width=60
-		height=20
-	}
-	control {
-		chan="$(P)$(R)MilDispOn"
-		clr=14
-		bclr=51
-	}
-}
-"text update" {
-	object {
-		x=244
-		y=667
-		width=80
-		height=18
-	}
-	monitor {
-		chan="$(P)$(R)MilDispBitShift_RBV"
-		clr=54
-		bclr=4
-	}
-	limits {
-	}
-}
-"text entry" {
-	object {
-		x=179
-		y=666
-		width=60
-		height=20
-	}
-	control {
-		chan="$(P)$(R)MilDispBitShift"
-		clr=14
-		bclr=51
-	}
-	limits {
-	}
-}
-text {
-	object {
-		x=84
-		y=666
-		width=90
-		height=20
-	}
-	"basic attribute" {
-		clr=14
-	}
-	textix="Bit shift"
-	align="horiz. right"
-}
 composite {
 	object {
 		x=115
@@ -1436,7 +1308,7 @@ rectangle {
 		x=5
 		y=580
 		width=350
-		height=110
+		height=160
 	}
 	"basic attribute" {
 		clr=14
@@ -1598,5 +1470,218 @@ composite {
 			limits {
 			}
 		}
+	}
+}
+text {
+	object {
+		x=101
+		y=690
+		width=60
+		height=20
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="Offset"
+	align="horiz. right"
+}
+text {
+	object {
+		x=70
+		y=665
+		width=90
+		height=20
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="Bit shift"
+	align="horiz. right"
+}
+text {
+	object {
+		x=111
+		y=714
+		width=50
+		height=20
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="Scale"
+	align="horiz. right"
+}
+text {
+	object {
+		x=101
+		y=615
+		width=60
+		height=20
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="Enable"
+	align="horiz. right"
+}
+text {
+	object {
+		x=91
+		y=640
+		width=70
+		height=20
+	}
+	"basic attribute" {
+		clr=14
+	}
+	textix="Lin/Log"
+	align="horiz. right"
+}
+"text update" {
+	object {
+		x=252
+		y=691
+		width=80
+		height=18
+	}
+	monitor {
+		chan="$(P)$(R)MilDispOffset_RBV"
+		clr=54
+		bclr=4
+	}
+	limits {
+	}
+}
+"text update" {
+	object {
+		x=251
+		y=666
+		width=80
+		height=18
+	}
+	monitor {
+		chan="$(P)$(R)MilDispBitShift_RBV"
+		clr=54
+		bclr=4
+	}
+	limits {
+	}
+}
+"text update" {
+	object {
+		x=252
+		y=715
+		width=80
+		height=18
+	}
+	monitor {
+		chan="$(P)$(R)MilDispScale_RBV"
+		clr=54
+		bclr=4
+	}
+	limits {
+	}
+}
+"text update" {
+	object {
+		x=252
+		y=616
+		width=80
+		height=18
+	}
+	monitor {
+		chan="$(P)$(R)MilDispOn_RBV"
+		clr=54
+		bclr=4
+	}
+	format="string"
+	limits {
+	}
+}
+"text update" {
+	object {
+		x=252
+		y=641
+		width=80
+		height=18
+	}
+	monitor {
+		chan="$(P)$(R)MilDispLog_RBV"
+		clr=54
+		bclr=4
+	}
+	format="string"
+	limits {
+	}
+}
+"text entry" {
+	object {
+		x=166
+		y=690
+		width=80
+		height=20
+	}
+	control {
+		chan="$(P)$(R)MilDispOffset"
+		clr=14
+		bclr=51
+	}
+	limits {
+	}
+}
+"text entry" {
+	object {
+		x=166
+		y=665
+		width=80
+		height=20
+	}
+	control {
+		chan="$(P)$(R)MilDispBitShift"
+		clr=14
+		bclr=51
+	}
+	limits {
+	}
+}
+"text entry" {
+	object {
+		x=166
+		y=714
+		width=80
+		height=20
+	}
+	control {
+		chan="$(P)$(R)MilDispScale"
+		clr=14
+		bclr=51
+	}
+	limits {
+	}
+}
+menu {
+	object {
+		x=166
+		y=615
+		width=80
+		height=20
+	}
+	control {
+		chan="$(P)$(R)MilDispOn"
+		clr=14
+		bclr=51
+	}
+}
+menu {
+	object {
+		x=166
+		y=640
+		width=80
+		height=20
+	}
+	control {
+		chan="$(P)$(R)MilDispLog"
+		clr=14
+		bclr=51
 	}
 }
