@@ -24,17 +24,16 @@
 #include <epicsTime.h>
 #include <epicsThread.h>
 #include <epicsEvent.h>
-#include <epicsMutex.h>
 #include <epicsString.h>
 #include <epicsStdio.h>
-#include <epicsMutex.h>
 #include <cantProceed.h>
 #include <iocsh.h>
-#include <epicsExport.h>
 
 #include <asynOctetSyncIO.h>
 
 #include "ADDriver.h"
+
+#include <epicsExport.h>
 
 #define DRIVER_VERSION      1
 #define DRIVER_REVISION     0
@@ -43,7 +42,6 @@
 /** Messages to/from camserver */
 #define MAX_MESSAGE_SIZE 1024
 #define MAX_FILENAME_LEN 256
-#define MAX_BAD_PIXELS 100
 /** Time to poll when reading from camserver */
 #define ASYN_POLL_TIME .01
 #define CAMSERVER_DEFAULT_TIMEOUT 1.0
@@ -90,15 +88,16 @@ static const char *driverName = "mmpadDetector";
 #define mmpadAVGAcquireString     "AVGACQUIRE"
 #define mmpadAVGFileString        "AVGFILE"
 #define mmpadAVGCountString       "AVGCOUNT"
+
 #define mmpadBGSubtractString     "BG_SUBTRACT"
 #define mmpadBGFileString         "BGFILE"
-
 #define mmpadBackSubFlagString    "BACKSUB_FLAG"
+
 #define mmpadMilDispBitShiftString "MILDISP_BITSHIFT"
 #define mmpadMilDispOnString      "MILDISP_ON"
+#define mmpadMilDispLogString     "MILDISP_LOG"
 #define mmpadMilDispOffsetString  "MILDISP_OFFSET"
-
-#define mmpadResetFrameString     "RESET_FRAME"
+#define mmpadMilDispScaleString   "MILDISP_SCALE"
 
 #define mmpadRoiSumString         "ROI_SUM"
 #define mmpadRoiULString          "ROI_UL"
@@ -128,18 +127,20 @@ class mmpadDetector : public ADDriver
 #define FIRST_mmpad_PARAM mmpadDelayTime
     int mmpadArmed;
     int mmpadImageFileTmot;
-    int mmpadAVGAcquire;
-    int mmpadBGSubtract;
 
+    int mmpadBGSubtract;
+    int mmpadBGFile;
     int mmpadBackSubFlag;
+
     int mmpadMilDispBitShift;
     int mmpadMilDispOn;
+    int mmpadMilDispLog;
     int mmpadMilDispOffset;
+    int mmpadMilDispScale;
 
+    int mmpadAVGAcquire;
     int mmpadAVGFile;
     int mmpadAVGCount;
-    int mmpadResetFrame;
-    int mmpadBGFile;
     
     int mmpadRoiSum;
     int mmpadRoiUL;
@@ -522,7 +523,7 @@ asynStatus mmpadDetector::readCamserver(double timeout)
         status = pasynOctetSyncIO->read(pasynUser, this->fromCamserver,
                                         sizeof(this->fromCamserver), ASYN_POLL_TIME,
                                         &nread, &eomReason);
-        /* Check for an abort event sent during a read. Otherwise we can miss it and mess up the next acqusition.*/
+        /* Check for an abort event sent during a read. Otherwise we can miss it and mess up the next acquisition.*/
         eventStatus = epicsEventWaitWithTimeout(this->stopEventId, 0.001);
         lock();
         if (eventStatus == epicsEventWaitOK) {
@@ -906,41 +907,46 @@ asynStatus mmpadDetector::writeInt32(asynUser *pasynUser, epicsInt32 value)
     char filePath[MAX_FILENAME_LEN];
     char fileName[MAX_FILENAME_LEN];
     int imgcount;
-    int milbitshift, milon,miloffset;
+    int milbitshift, milon,miloffset, millog, milscale;
     int testDone;
+    int acquire;
+    int imageMode;
     string a;
     stringstream sstr;
     const char *functionName = "writeInt32";
 
+    getIntegerParam(ADAcquire, &acquire);
     status = setIntegerParam(function, value);
   
     if (function == ADAcquire) {
         getIntegerParam(ADStatus, &adstatus);
-        if (value && (adstatus == ADStatusIdle || adstatus == ADStatusError)) {
-            /* Send an event to wake up the mmpad task.  */
-            epicsEventSignal(this->startEventId);
+        getIntegerParam(ADImageMode, &imageMode);
+        if (value && !acquire) {
+            if (imageMode == mmpadImageModeNormal) {
+                /* Send an event to wake up the mmpad task.  */
+                epicsEventSignal(this->startEventId);
+            } else {
+                epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "videomodeon %f", videomodeTime);
+                writeReadCamserver(0.2); 
+            }
         }
-        if (!value && (adstatus == ADStatusAcquire)) {
+        if (!value && (acquire)) {
             /* This was a command to stop acquisition */
-            epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "Stop");
-            writeReadCamserver(CAMSERVER_DEFAULT_TIMEOUT);
-            epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "K");
-            writeCamserver(CAMSERVER_DEFAULT_TIMEOUT);
-            epicsEventSignal(this->stopEventId);
+            if (imageMode == mmpadImageModeNormal) {
+                epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "K");
+                writeCamserver(CAMSERVER_DEFAULT_TIMEOUT);
+                epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "mmpadcommand reset_frame");
+                writeReadCamserver(CAMSERVER_DEFAULT_TIMEOUT);
+                epicsEventSignal(this->stopEventId);
+            } else {
+                epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "videomodeoff");
+                writeReadCamserver(0.2);
+            }
         }
     } else if ((function == ADTriggerMode) ||
                (function == ADNumImages) ||
                (function == ADNumExposures)) {
         setAcquireParams();
-    } else if(function == ADImageMode) {
-        if (value == mmpadImageModeNormal) {
-            epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "videomodeoff");
-            writeReadCamserver(0.2);
-        } else if (value == mmpadImageModeVideo) {
-            getDoubleParam(ADAcquireTime, &videomodeTime);
-            epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "videomodeon %f", videomodeTime);
-            writeReadCamserver(0.2); 
-        }
     } else if (function == mmpadAVGAcquire) {
         testDone = 1;
         if (value) {
@@ -974,15 +980,6 @@ asynStatus mmpadDetector::writeInt32(asynUser *pasynUser, epicsInt32 value)
             setIntegerParam(mmpadAVGAcquire, 0);  
         }
     }
-    else if (function == mmpadResetFrame) {
-        if (value) {
-            epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "mmpadcommand reset_frame");
-            writeReadCamserver(0.2);
-             //writeReadCamserver(0);
-             //writeCamserver(CAMSERVER_DEFAULT_TIMEOUT);
-            setIntegerParam(mmpadResetFrame, 0);
-        }
-    }
     
     else if (function == mmpadBackSubFlag) {
         if (!value) {
@@ -1005,11 +1002,19 @@ asynStatus mmpadDetector::writeInt32(asynUser *pasynUser, epicsInt32 value)
         getIntegerParam(mmpadMilDispOn,&milon);
         getIntegerParam(mmpadMilDispOffset,&miloffset);
         epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "mmpadcommand mildisp %d %d %d",milbitshift,milon,miloffset);
-        //writeReadCamserver(0);
         writeReadCamserver(0.2);
-        //writeCamserver(CAMSERVER_DEFAULT_TIMEOUT);
     }
     
+    else if ((function == mmpadMilDispLog) ||
+             (function == mmpadMilDispScale) ||
+             (function == mmpadMilDispOffset)) {
+        getIntegerParam(mmpadMilDispLog,&millog);
+        getIntegerParam(mmpadMilDispScale,&milscale);
+        getIntegerParam(mmpadMilDispOffset,&miloffset);
+        epicsSnprintf(this->toCamserver, sizeof(this->toCamserver), "mmpadcommand loglin %d %d %d",millog,milscale,miloffset);
+        writeReadCamserver(0.2);
+    }
+
     else {
         /* If this parameter belongs to a base class call its method */
         if (function < FIRST_mmpad_PARAM) status = ADDriver::writeInt32(pasynUser, value);
@@ -1192,7 +1197,6 @@ mmpadDetector::mmpadDetector(const char *portName, const char *camserverPort,
     char versionString[20];
     int milbitshift, milon, miloffset;
   
-  
     /* Create the epicsEvents for signaling to the mmpad task when acquisition starts and stops */
     this->startEventId = epicsEventCreate(epicsEventEmpty);
     if (!this->startEventId) {
@@ -1221,17 +1225,19 @@ mmpadDetector::mmpadDetector(const char *portName, const char *camserverPort,
     createParam(mmpadImageFileTmotString,  asynParamFloat64, &mmpadImageFileTmot);
     
     createParam(mmpadAVGAcquireString,     asynParamInt32,   &mmpadAVGAcquire);
-    createParam(mmpadBGSubtractString,     asynParamInt32,   &mmpadBGSubtract);
-    createParam(mmpadAVGCountString,       asynParamInt32,   &mmpadAVGCount);
-    
     createParam(mmpadAVGFileString,        asynParamOctet ,  &mmpadAVGFile);
+    createParam(mmpadAVGCountString,       asynParamInt32,   &mmpadAVGCount);
+
+    createParam(mmpadBGSubtractString,     asynParamInt32,   &mmpadBGSubtract);
     createParam(mmpadBGFileString,         asynParamOctet ,  &mmpadBGFile);
-    
     createParam(mmpadBackSubFlagString,    asynParamInt32,   &mmpadBackSubFlag);
+    
     createParam(mmpadMilDispBitShiftString, asynParamInt32,  &mmpadMilDispBitShift);
     createParam(mmpadMilDispOnString,      asynParamInt32,   &mmpadMilDispOn);
+    createParam(mmpadMilDispLogString,     asynParamInt32,   &mmpadMilDispLog);
     createParam(mmpadMilDispOffsetString,  asynParamInt32,   &mmpadMilDispOffset);
-    createParam(mmpadResetFrameString,     asynParamInt32,   &mmpadResetFrame);
+    createParam(mmpadMilDispScaleString,   asynParamInt32,   &mmpadMilDispScale);
+
     createParam(mmpadRoiSumString,         asynParamInt32,   &mmpadRoiSum);
     createParam(mmpadRoiULString,          asynParamInt32,   &mmpadRoiUL);
     createParam(mmpadRoiURString,          asynParamInt32,   &mmpadRoiUR);
@@ -1243,9 +1249,7 @@ mmpadDetector::mmpadDetector(const char *portName, const char *camserverPort,
     status |= (asynStatus)callParamCallbacks();
     status |= setIntegerParam(mmpadAVGCount, 40);
     status |= (asynStatus)callParamCallbacks();
-    
-    
-    
+
     status |= setStringParam (ADManufacturer, "Cornell");
     status |= setStringParam (ADModel, "mmpad");
     epicsSnprintf(versionString, sizeof(versionString), "%d.%d.%d", 
