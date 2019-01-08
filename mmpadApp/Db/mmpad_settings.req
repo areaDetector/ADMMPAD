@@ -1,29 +1,17 @@
 file "ADBase_settings.req", P=$(P), R=$(R)
 file "NDFile_settings.req", P=$(P), R=$(R)
 $(P)$(R)DelayTime
-$(P)$(R)ChipScale0
-$(P)$(R)ChipScale1
-$(P)$(R)ChipScale2
-$(P)$(R)ChipScale3
-$(P)$(R)ChipScale4
-$(P)$(R)ChipScale5
+$(P)$(R)ImageFileTmot
+$(P)$(R)AVGAcquire
+$(P)$(R)AVGCount
+$(P)$(R)AVGFile
+$(P)$(R)BGSubtract
+$(P)$(R)BGFile
 $(P)$(R)BackSubFlag
 $(P)$(R)MilDispBitShift
 $(P)$(R)MilDispOn
+$(P)$(R)MilDispLog
 $(P)$(R)MilDispOffset
-$(P)$(R)AVGAcquire
-$(P)$(R)AVGCount
-$(P)$(R)BGSubtract
-$(P)$(R)AVGFile
-$(P)$(R)BGFile
-$(P)$(R)ImageFileTmot
-$(P)$(R)SetFileIncNumber
-$(P)$(R)ResetFrame
-$(P)$(R)ROI_Sum
-$(P)$(R)ROI_UR
-$(P)$(R)ROI_UL
-$(P)$(R)ROI_LL
-$(P)$(R)ROI_LR
-$(P)$(R)CamserverAsyn
+$(P)$(R)MilDispScale
 
 
